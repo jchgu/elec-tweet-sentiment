@@ -235,7 +235,7 @@ freqs |> filter(feature %in% nrc_dict$surprise) |> as_tibble()
 ```
 
 Keyword in context
-```{} 
+```{r KWIC} 
 #This chunk takes long time to run; Skip if necessary
 head(kwic(tokens(corp), "president"))
 head(kwic(tokens(corp), "white"))
