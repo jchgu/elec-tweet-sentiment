@@ -1,0 +1,339 @@
+---
+title: "Sentiment in Election-related Tweets during Capitol Storming"
+output: html_notebook
+---
+
+```{r Load packages}
+library(tidyverse)
+library(quanteda)
+library(quanteda.textplots)
+library(quanteda.textstats)
+library(syuzhet)
+```
+
+Load hydrated tweets
+```{r Load data}
+dt <- read_csv('Capitol_tweet_0106.csv') 
+```
+
+Total number of tweets
+```{r number of tweets}
+nrow(dt)
+```
+
+Count no. of users and tweets per user
+```{r number of users}
+dt_user_count <- dt$user_screen_name |> n_distinct()
+dt_user_count
+dt_tweet_per_user <- nrow(dt)/dt_user_count
+dt_tweet_per_user
+```
+
+Users who tweeted most actively
+```{r Find active user}
+dt_user <- dt |> count(user_screen_name, sort = T)
+dt_user |> head(25)
+```
+
+# Preprocess text
+```{r Build corpus}
+corp <- corpus(dt, text_field = 'text')
+```
+
+```{r Build DTM}
+dtm <- corp |>
+  tokens(remove_punct = T, remove_numbers = T, remove_symbols = T) |>
+  tokens_tolower() |>                                                    
+  tokens_remove(stopwords('en')) |> 
+  tokens_remove(c('rt', "http(.*)"), valuetype = "regex") |>
+  dfm()
+```
+
+# Co-occurrence analysis
+```{r Plot wordcloud}
+set.seed(5)
+dtm |> textplot_wordcloud(max_words = 50)
+```
+
+## Hashtag
+Extract most common hashtags
+```{r Show frequent hashtags}
+tag_dfm <- dtm |> 
+  dfm_select(pattern = "#*")
+top_tag <- tag_dfm |> topfeatures(50) |> names()
+top_tag |> head(20)
+```
+
+Construct feature co-occurrence matrix of hashtags
+```{r Build FCM of hashtag}
+tag_fcm <- tag_dfm |> fcm()
+top_tag_fcm <- tag_fcm |> fcm_select(pattern = top_tag)
+```
+
+```{r Plot FCM of hashtag}
+set.seed(5)
+top_tag_fcm |> textplot_network(min_freq = 0.1)
+```
+
+## Mention
+Extract most frequently mentioned usernames
+```{r Show most mentioned username}
+user_dfm <- dtm |> 
+  dfm_select(pattern = "@*")
+top_user <- user_dfm |> topfeatures(50) |> names()
+top_user |> head(25)
+```
+
+Construct feature co-occurrence matrix of usernames
+```{r Build FCM of username}
+user_fcm <- user_dfm |> fcm()
+top_user_fcm <- user_fcm |> fcm_select(pattern = top_user)
+```
+
+```{r Plot FCM of username}
+set.seed(5)
+top_user_fcm |> textplot_network(min_freq = 0.1)
+```
+
+# Sentiment analysis
+Build NRC dictionary in quanteda form
+```{r Build dictionary}
+nrc <- get_sentiment_dictionary(dictionary = 'nrc')
+nrc_posi <- nrc$word[nrc$sentiment == 'positive']
+nrc_nega <- nrc$word[nrc$sentiment == 'negative']
+nrc_angr <- nrc$word[nrc$sentiment == 'anger']
+nrc_disg <- nrc$word[nrc$sentiment == 'disgust']
+nrc_fear <- nrc$word[nrc$sentiment == 'fear']
+nrc_sad <- nrc$word[nrc$sentiment == 'sadness']
+nrc_joy <- nrc$word[nrc$sentiment == 'joy']
+nrc_antc <- nrc$word[nrc$sentiment == 'anticipation']
+nrc_trus <- nrc$word[nrc$sentiment == 'trust']
+nrc_surp <- nrc$word[nrc$sentiment == 'surprise']
+nrc_dict <- dictionary(list(
+  positive=nrc_posi,
+  negative=nrc_nega,
+  anger=nrc_angr,
+  disgust=nrc_disg,
+  fear=nrc_fear,
+  sad=nrc_sad,
+  joy=nrc_joy,
+  anticipation=nrc_antc,
+  trust=nrc_trus,
+  surprise=nrc_surp))
+```
+
+Look up in DFM with NRC dictionary
+```{r Lookup}
+senti <- dtm |> dfm_lookup(nrc_dict) |> convert(to = "data.frame") |> as_tibble()
+senti <- senti |> mutate(length = ntoken(dtm))
+```
+
+Percentage of positive words in DTM
+```{r % positive}
+positive <- sum(senti$positive)/sum(senti$length)
+positive
+```
+
+Percentage of negative words in DTM
+```{r % negative}
+negative <- sum(senti$negative)/sum(senti$length)
+negative
+```
+
+Percentage of anger words in DTM
+```{r % anger}
+anger <- sum(senti$anger)/sum(senti$length)
+anger
+```
+
+Percentage of anticipation words in DTM
+```{r % anticipation}
+anticipation <- sum(senti$anticipation)/sum(senti$length)
+anticipation
+```
+
+Percentage of disgust words in DTM
+```{r % disgust}
+disgust <- sum(senti$disgust)/sum(senti$length)
+disgust
+```
+
+Percentage of fear words in DTM
+```{r % fear}
+fear <- sum(senti$fear)/sum(senti$length)
+fear
+```
+
+Percentage of joy words in DTM
+```{r % joy}
+joy <- sum(senti$joy)/sum(senti$length)
+joy
+```
+
+Percentage of sad words in DTM
+```{r % sad}
+sad <- sum(senti$sad)/sum(senti$length)
+sad
+```
+
+Percentage of trust words in DTM
+```{r %trust}
+trust <- sum(senti$trust)/sum(senti$length)
+trust
+```
+
+Percentage of surprise words in DTM
+```{r %surprise}
+surprise <- sum(senti$surprise)/sum(senti$length)
+surprise
+```
+
+Overall sentiment score
+```{r overall score}
+sentiment1 <- (sum(senti$positive) - sum(senti$negative)) / (sum(senti$positive) + sum(senti$negative))
+sentiment1
+```
+
+## Improve dictionary
+```{r positive word frequency}
+freqs <- textstat_frequency(dtm)
+freqs |> as_tibble() |> filter(feature %in% nrc_dict$positive)
+```
+
+```{r negative word frequency}
+freqs |> as_tibble() |> filter(feature %in% nrc_dict$negative)
+```
+
+```{r trust word frequency}
+freqs |> 
+  filter(feature %in% nrc_dict$trust) |>
+  as_tibble()
+```
+
+```{r sad word frequency}
+freqs |> filter(feature %in% nrc_dict$sad) |> as_tibble()
+```
+
+```{r anticipation word frequency}
+freqs|> filter(feature %in% nrc_dict$anticipation) |> as_tibble() 
+```
+
+```{r disgust word frequency}
+freqs |> filter(feature %in% nrc_dict$disgust) |> as_tibble()
+```
+
+```{r fear word frequency}
+freqs |> filter(feature %in% nrc_dict$fear) |> as_tibble()
+```
+
+```{r joy word frequency}
+freqs |> filter(feature %in% nrc_dict$joy) |> as_tibble()
+```
+
+```{r surprise word frequency}
+freqs |> filter(feature %in% nrc_dict$surprise) |> as_tibble()
+```
+
+Keyword in context
+```{} 
+#This chunk takes long time to run; Skip if necessary
+head(kwic(tokens(corp), "president"))
+head(kwic(tokens(corp), "white"))
+head(kwic(tokens(corp), "police"))
+head(kwic(tokens(corp), "vote"))
+head(kwic(tokens(corp), "blue"))
+head(kwic(tokens(corp), "senate"))
+head(kwic(tokens(corp), "black"))
+head(kwic(tokens(corp), "vice"))
+head(kwic(tokens(corp), "serve"))
+head(kwic(tokens(corp), "feeling"))
+```
+
+Remove dubious words from dictionary
+```{r Remove dubious words from dictionary}
+nrc_posi_2 <- setdiff(nrc_posi, c("white", "police", "president", "general"))
+nrc_nega_2 <- setdiff(nrc_nega, c("black", "vice", "serve"))
+nrc_angr_2 <- nrc$word[nrc$sentiment == 'anger']
+nrc_disg_2 <- nrc$word[nrc$sentiment == 'disgust']
+nrc_fear_2 <- nrc$word[nrc$sentiment == 'fear']
+nrc_sad_2 <- setdiff(nrc_sad, c("blue","black"))
+nrc_joy_2 <- setdiff(nrc_joy, "white")
+nrc_antc_2 <- setdiff(nrc_antc, "white")
+nrc_trus_2 <- setdiff(nrc_trus, c("white", "general", "president", "senate"))
+nrc_surp_2 <- setdiff(nrc_surp, "trump")
+nrc_dict_2 <- dictionary(list(
+  positive=nrc_posi_2,
+  negative=nrc_nega_2,
+  anger=nrc_angr_2,
+  disgust=nrc_disg_2,
+  fear=nrc_fear_2,
+  sad=nrc_sad_2,
+  joy=nrc_joy_2,
+  anticipation=nrc_antc_2,
+  trust=nrc_trus_2,
+  surprise=nrc_surp_2
+  )) 
+```
+
+```{r}
+freqs |> filter(feature %in% nrc_dict_2$positive)
+freqs |> filter(feature %in% nrc_dict_2$negative)
+```
+
+## Test improved NRC dictionary
+```{r}
+senti2 <- dtm |> dfm_lookup(nrc_dict_2) |> 
+  convert(to = "data.frame") |> as_tibble()
+senti2$length <- ntoken(dtm)
+```
+
+Percentage of positive words in DTM
+```{r % positive reexamined}
+positive2 <- sum(senti2$positive)/sum(senti2$length)
+positive2
+```
+
+Percentage of negative words in DTM
+```{r % negative reexamined}
+negative2 <- sum(senti2$negative)/sum(senti2$length)
+negative2
+```
+
+Percentage of anticipation words in DTM
+```{r % anticipation reexamined}
+anticipation2 <- sum(senti2$anticipation)/sum(senti2$length)
+anticipation2
+```
+
+Percentage of joy words in DTM
+```{r % joy reexamined}
+joy2 <- sum(senti2$joy)/sum(senti2$length)
+joy2
+```
+
+Percentage of sad words in DTM
+```{r % sad reexamined}
+sad2 <- sum(senti2$sad)/sum(senti2$length)
+sad2
+```
+
+Percentage of trust words in DTM
+```{r % trust reexamined}
+trust2 <- sum(senti2$trust)/sum(senti2$length)
+trust2
+```
+
+Percentage of surprise words in DTM
+```{r % surprise reexamined}
+surprise2 <- sum(senti2$surprise)/sum(senti2$length)
+surprise2
+```
+
+Overall sentiment score
+```{r Overall score reexamined}
+sentiment2 <- (sum(senti2$positive) - sum(senti2$negative)) / (sum(senti2$positive) + sum(senti2$negative))
+sentiment2
+```
+
+
+
