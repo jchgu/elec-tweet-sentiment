@@ -34,7 +34,13 @@ I adopt `R` (version 4.2.0) for all the analyses. This involves the following pa
 
 ## Memory and Runtime 
 
-It takes less than ten minutes to reproduce the analyses on a standard 2022 desktop machine. The code was last run on a Windows 11 laptop with a 4-core Intel processor.
+Less than ten minutes is needed to reproduce the analyses on a standard 2022 desktop machine. This does not account for Chunk 37, which takes a long time to run. The code was last run on a Windows 11 laptop with a 4-core Intel processor. 
+
+# Instructions to Replicators
+
+Download `ElecTweetID.csv`. Load it in Hydrator to access Twitter API and retrieve the original text. Save the collected tweets as `Capitol_tweet_0106.csv`. Place it and `script.Rmd` in the same folder. Run the script to execute all steps in sequence. Chunk 37's execution is time-consuming; Skip it if necessary.
+
+The script is provided in the same folder. Run `data/Gu-thesis-script.Rmd` to execute all steps in sequence. 
 
 # Reference
 
