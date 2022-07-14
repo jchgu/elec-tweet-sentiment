@@ -1,6 +1,6 @@
 # Overview
 
-During the Capitol storming on January 6, 2021, what kinds of sentiment manifested in the English tweets discussing U.S. electoral affairs? I conduct sentiment analysis with 270,000 Tweets. This exercise was an assignment for the course session [Supervised Sentiment Analysis in R](https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/sentiment_analysis.md) by [@ccs-amsterdam](https://github.com/ccs-amsterdam).
+During the Capitol storming on January 6, 2021, what kinds of sentiment manifested in the English tweets discussing U.S. electoral affairs? My classmate Sarah Sramota and I conducted sentiment analysis with 270,000 Tweets. I implemented the code and Sarah wrote up the findings. This was an assignment for the tutorial [Supervised Sentiment Analysis in R](https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/sentiment_analysis.md) by [@ccs-amsterdam](https://github.com/ccs-amsterdam) in January 2021. One year and a half later, I updated the code to be compatible with the latest R pacakges.
 
 # Data Availability and Provenance Statements
 
