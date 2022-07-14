@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 ```{r Load packages}
-library(tidyverse)
+library(readr)
 library(quanteda)
 library(quanteda.textplots)
 library(quanteda.textstats)
@@ -44,7 +44,6 @@ corp <- corpus(dt, text_field = 'text')
 dtm <- corp |>
   tokens(remove_punct = T, remove_numbers = T, remove_symbols = T) |>
   tokens_tolower() |>                                                    
-  tokens_remove(stopwords('en')) |> 
   tokens_remove(c('rt', "http(.*)"), valuetype = "regex") |>
   dfm()
 ```
