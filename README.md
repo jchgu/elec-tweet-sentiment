@@ -1,6 +1,6 @@
 # Overview
 
-During the Capitol storming on January 6, 2021, what kinds of sentiment manifested in the English tweets discussing U.S. electoral affairs? I conduct sentiment analysis with 270,000 Tweets. This exercise was an assignment for the course session [Supervised Sentiment Analysis in R](https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/sentiment_analysis.md) by [@ccs-amsterdam](https://github.com/ccs-amsterdam)
+During the Capitol storming on January 6, 2021, what kinds of sentiment manifested in the English tweets discussing U.S. electoral affairs? I conduct sentiment analysis with 270,000 Tweets. This exercise was an assignment for the course session [Supervised Sentiment Analysis in R](https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/sentiment_analysis.md) by [@ccs-amsterdam](https://github.com/ccs-amsterdam).
 
 # Data Availability and Provenance Statements
 
@@ -40,7 +40,7 @@ Less than ten minutes is needed to reproduce the analyses on a standard 2022 des
 
 Download `ElecTweetID.csv`. Load it in Hydrator to access Twitter API and retrieve the original text. Save the collected tweets as `Capitol_tweet_0106.csv`. Place it and `script.Rmd` in the same folder. Run the script to execute all steps in sequence. Chunk 37's execution is time-consuming; Skip it if necessary.
 
-The script is provided in the same folder. Run `data/Gu-thesis-script.Rmd` to execute all steps in sequence. 
+The script is provided in the same folder. Run `script_tweet_sentiment.Rmd` to execute all steps in sequence. 
 
 # Reference
 
