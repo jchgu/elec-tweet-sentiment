@@ -4,7 +4,7 @@ During the Capitol storming on January 6, 2021, what kinds of sentiment manifest
 
 # Data Availability and Provenance Statements
 
-My assignment uses the data from [2020 US Presidential Election Tweet IDs](https://github.com/echen102/us-pres-elections-2020#2020-us-presidential-election-tweet-ids) collected by [@echen102](https://github.com/echen102) and [@emilioferrara](https://github.com/emilioferrara). The following conditions apply:
+This assignment used the data from [2020 US Presidential Election Tweet IDs](https://github.com/echen102/us-pres-elections-2020#2020-us-presidential-election-tweet-ids) collected by [@echen102](https://github.com/echen102) and [@emilioferrara](https://github.com/emilioferrara). The following conditions apply:
 
 > This dataset is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License (CC BY-NC-SA 4.0). By using this dataset, you agree to abide by the stipulations in the license, remain in compliance with Twitter’s Terms of Service, and cite the following manuscript:
 > 
@@ -14,7 +14,7 @@ Specifically, Twitter's Terms of Service only allows the sharing of Tweet IDs. T
 
 ## Statement about Rights
 
-I certify that I have legitimate access to and permission to use the data. 
+I certify that the authors have legitimate access to and permission to use the data. 
 
 ## Summary of Availability
 
